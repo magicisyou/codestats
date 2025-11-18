@@ -1,16 +1,29 @@
 use std::{
+    fmt,
     fs::{self, File},
     io::{self, BufRead, BufReader},
     path::Path,
 };
 
-#[derive(Eq, Hash, PartialEq, Debug)]
+#[derive(Eq, Hash, PartialEq, Debug, Clone)]
 pub enum Language {
     C,
     Cpp,
     Python,
     Rust,
     Others,
+}
+
+impl fmt::Display for Language {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            Self::C => write!(f, "C"),
+            Self::Cpp => write!(f, "C++"),
+            Self::Python => write!(f, "Python"),
+            Self::Rust => write!(f, "Rust"),
+            Self::Others => write!(f, "others"),
+        }
+    }
 }
 
 impl Language {
@@ -40,12 +53,8 @@ impl LanguageStats {
 
         if let Some(ext) = extension {
             let language = Language::from_extension(ext);
-            let mut lines = 0;
-            let mut words = 0;
-            if language != Language::Others {
-                (lines, words) =
-                    Self::count_lines_and_words(filename).expect("Counting lines and words failed");
-            }
+            let (lines, words) =
+                Self::count_lines_and_words(filename).expect("Counting lines and words failed");
 
             return Some((
                 language,

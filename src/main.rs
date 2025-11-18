@@ -1,7 +1,9 @@
+use ignore::Walk;
 use std::{collections::HashMap, env};
-use walkdir::WalkDir;
+use tabled::settings::Style;
 
 mod file_types;
+mod table_view;
 
 use file_types::{Language, LanguageStats};
 
@@ -12,8 +14,9 @@ struct Analyzer {
 
 impl Analyzer {
     fn analyze(&mut self, path: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let walker = WalkDir::new(path).into_iter();
-        for entry in walker {
+        // let walker = WalkDir::new(path).into_iter();
+        // for entry in walker {
+        for entry in Walk::new(path) {
             if let Some(file_name) = entry?.path().to_str()
                 && let Some((language, stat)) = LanguageStats::get(file_name)
             {
@@ -28,13 +31,17 @@ impl Analyzer {
         Ok(())
     }
 
-    fn show_statistics(&self) {
+    fn get_data(&self) -> Vec<table_view::Data> {
+        let mut data = vec![];
         for (language, stat) in &self.result {
-            println!(
-                "{:?}: {}: {}: {}",
-                language, stat.files, stat.lines, stat.words
-            );
+            data.push(table_view::Data {
+                language: language.clone(),
+                files: stat.files,
+                lines: stat.lines,
+                words: stat.words,
+            });
         }
+        data
     }
 }
 
@@ -68,5 +75,8 @@ fn main() {
         eprintln!("Err: {e}");
     }
 
-    analyzer.show_statistics();
+    // analyzer.show_statistics();
+    let mut table = tabled::Table::new(analyzer.get_data());
+    table.with(Style::modern());
+    println!("{}", table);
 }
