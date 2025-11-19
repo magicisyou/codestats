@@ -30,7 +30,7 @@ fn main() {
 
     if let Err(e) = analyzer.analyze() {
         eprintln!("Err: {e}");
+    } else {
+        analyzer.show_table();
     }
-
-    analyzer.show_table();
 }

@@ -6,4 +6,5 @@ cli tool to analyze the programming languages used in a project respecting the g
 
 ![Screenshot](/docs/screenshot.webp)
 
-
+#### Note
+Icons requires a Nerd font to be installed"

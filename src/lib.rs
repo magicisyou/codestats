@@ -46,8 +46,9 @@ impl Analyzer {
             .map(|(language, statistics)| Data::from(language, statistics))
             .collect();
 
-        let mut table = Table::new(data);
-        table.with(Style::sharp());
+        let mut table = Table::new(&data);
+        table.with(Style::rounded());
+
         println!("{}", table);
     }
 }

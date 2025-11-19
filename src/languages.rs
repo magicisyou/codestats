@@ -121,4 +121,41 @@ impl Language {
             _ => Self::Others,
         }
     }
+
+    pub fn icon(&self) -> &'static str {
+        match self {
+            Self::Arduino => "\u{e733}",
+            Self::Assembly => "\u{e6ab}",
+            Self::Bash | Self::Shell => "\u{e760}",
+            Self::C => "\u{e61e}",
+            Self::Clojure => "\u{e790}",
+            Self::CMake => "\u{e794}",
+            Self::Cpp => "\u{e61d}",
+            Self::CSharp => "\u{e7b2}",
+            Self::Css => "\u{e6b8}",
+            Self::Dart => "\u{e798}",
+            Self::Go => "\u{f07d3}",
+            Self::Haskell => "\u{e777}",
+            Self::Html => "\u{e736}",
+            Self::Java => "\u{e738}",
+            Self::Js => "\u{e781}",
+            Self::Json => "\u{eb0f}",
+            Self::JupyterNotebook => "\u{e80f}",
+            Self::Kotlin => "\u{e634}",
+            Self::Lua => "\u{e826}",
+            Self::Makefile => "\u{e673}",
+            Self::Markdown => "\u{e73e}",
+            Self::Perl => "\u{e769}",
+            Self::Php => "\u{e73d}",
+            Self::Python => "\u{e73c}",
+            Self::Ruby => "\u{e739}",
+            Self::Rust => "\u{e7a8}",
+            Self::Scala => "\u{e737}",
+            Self::Svelte => "\u{e8b7}",
+            Self::Swift => "\u{e755}",
+            Self::Toml => "\u{e6b2}",
+            Self::Ts => "\u{e69d}",
+            _ => "-",
+        }
+    }
 }

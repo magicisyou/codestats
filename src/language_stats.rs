@@ -17,10 +17,9 @@ impl LanguageStats {
         if !Self::is_file(file_path) || Self::is_dot_file(file_path) {
             return None;
         }
-        let extension = file_path.split('.').next_back();
 
-        if let Some(ext) = extension {
-            let language = Language::from_extension(ext);
+        if let Some(extension) = file_path.split('.').next_back() {
+            let language = Language::from_extension(extension);
             let (lines, words) =
                 Self::count_lines_and_words(file_path).expect("Counting lines and words failed");
 
