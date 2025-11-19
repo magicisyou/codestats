@@ -8,6 +8,7 @@ mod table_view;
 
 use language_stats::LanguageStats;
 use languages::Language;
+use table_view::Data;
 
 pub struct Analyzer {
     root: String,
@@ -24,30 +25,26 @@ impl Analyzer {
 
     pub fn analyze(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         for entry in Walk::new(&self.root) {
-            if let Some(file_name) = entry?.path().to_str()
-                && let Some((language, stat)) = LanguageStats::get(file_name)
+            if let Some(file_path) = entry?.path().to_str()
+                && let Some((language, statistics)) = LanguageStats::get(file_path)
             {
                 self.result
                     .entry(language)
-                    .and_modify(|s| {
-                        s.combine(&stat);
+                    .and_modify(|existing_statistics| {
+                        existing_statistics.combine(&statistics);
                     })
-                    .or_insert(stat);
+                    .or_insert(statistics);
             }
         }
         Ok(())
     }
 
-    pub fn show_table(&self) {
-        let mut data = vec![];
-        for (language, stat) in &self.result {
-            data.push(table_view::Data {
-                language: language.clone(),
-                files: stat.files,
-                lines: stat.lines,
-                words: stat.words,
-            });
-        }
+    pub fn show_table(self) {
+        let data: Vec<Data> = self
+            .result
+            .into_iter()
+            .map(|(language, statistics)| Data::from(language, statistics))
+            .collect();
 
         let mut table = Table::new(data);
         table.with(Style::sharp());

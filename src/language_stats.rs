@@ -13,16 +13,16 @@ pub struct LanguageStats {
 }
 
 impl LanguageStats {
-    pub fn get(filename: &str) -> Option<(Language, Self)> {
-        if !Self::is_file(filename) || Self::is_dot_file(filename) {
+    pub fn get(file_path: &str) -> Option<(Language, Self)> {
+        if !Self::is_file(file_path) || Self::is_dot_file(file_path) {
             return None;
         }
-        let extension = filename.split('.').next_back();
+        let extension = file_path.split('.').next_back();
 
         if let Some(ext) = extension {
             let language = Language::from_extension(ext);
             let (lines, words) =
-                Self::count_lines_and_words(filename).expect("Counting lines and words failed");
+                Self::count_lines_and_words(file_path).expect("Counting lines and words failed");
 
             return Some((
                 language,
