@@ -1,42 +1,10 @@
 use std::{
-    fmt,
     fs::{self, File},
     io::{self, BufRead, BufReader},
     path::Path,
 };
 
-#[derive(Eq, Hash, PartialEq, Debug, Clone)]
-pub enum Language {
-    C,
-    Cpp,
-    Python,
-    Rust,
-    Others,
-}
-
-impl fmt::Display for Language {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::C => write!(f, "C"),
-            Self::Cpp => write!(f, "C++"),
-            Self::Python => write!(f, "Python"),
-            Self::Rust => write!(f, "Rust"),
-            Self::Others => write!(f, "others"),
-        }
-    }
-}
-
-impl Language {
-    fn from_extension(extension: &str) -> Self {
-        match extension {
-            "c" | "h" => Self::C,
-            "cpp" | "hpp" => Self::Cpp,
-            "py" => Self::Python,
-            "rs" => Self::Rust,
-            _ => Self::Others,
-        }
-    }
-}
+use super::Language;
 
 pub struct LanguageStats {
     pub files: usize,
@@ -77,13 +45,13 @@ impl LanguageStats {
         let mut words = 0;
 
         for line_result in reader.lines() {
-            let line = line_result?;
+            if let Ok(line) = line_result {
+                words += line
+                    .split_whitespace()
+                    .filter(|word| !word.is_empty())
+                    .count();
+            }
             lines += 1;
-
-            words += line
-                .split_whitespace()
-                .filter(|word| !word.is_empty())
-                .count();
         }
 
         Ok((lines, words))
