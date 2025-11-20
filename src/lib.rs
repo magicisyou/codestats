@@ -1,5 +1,5 @@
 use ignore::Walk;
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 use tabled::{Table, settings::Style};
 
 mod language_stats;
@@ -11,12 +11,12 @@ use languages::Language;
 use table_view::Data;
 
 pub struct Analyzer {
-    root: String,
+    root: PathBuf,
     result: HashMap<Language, LanguageStats>,
 }
 
 impl Analyzer {
-    pub fn new(root: String) -> Self {
+    pub fn new(root: PathBuf) -> Self {
         Self {
             root,
             result: HashMap::new(),
@@ -25,9 +25,9 @@ impl Analyzer {
 
     pub fn analyze(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         for entry in Walk::new(&self.root) {
-            if let Some(file_path) = entry?.path().to_str()
-                && let Some((language, statistics)) = LanguageStats::get(file_path)
-            {
+            let file_path = entry?.into_path();
+            // if let Some(file_path) = entry?.path()
+            if let Some((language, statistics)) = LanguageStats::get(file_path) {
                 self.result
                     .entry(language)
                     .and_modify(|existing_statistics| {

@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, path::Path};
 
 #[derive(Eq, Hash, PartialEq, Debug, Clone)]
 pub enum Language {
@@ -36,7 +36,6 @@ pub enum Language {
     Swift,
     Toml,
     Ts,
-    Others,
 }
 
 impl fmt::Display for Language {
@@ -76,49 +75,55 @@ impl fmt::Display for Language {
             Self::Swift => write!(f, "Swift"),
             Self::Toml => write!(f, "TOML"),
             Self::Ts => write!(f, "Typescript"),
-            Self::Others => write!(f, "others"),
         }
     }
 }
 
 impl Language {
-    pub fn from_extension(extension: &str) -> Self {
-        match extension {
-            "ino" => Self::Arduino,
-            "asm" | "a51" | "inc" | "nasm" => Self::Assembly,
-            "bash" => Self::Bash,
-            "bat" | "cmd" => Self::Batchfile,
-            "c" | "h" => Self::C,
-            "clj" => Self::Clojure,
-            "cmake" => Self::CMake,
-            "cs" | "cake" | "cshtml" | "csx" => Self::CSharp,
-            "cpp" | "c++" | "cc" | "cp" | "cxx" | "hh" | "hpp" | "hxx" => Self::Cpp,
-            "css" => Self::Css,
-            "dart" => Self::Dart,
-            "go" => Self::Go,
-            "hs" | "hsc" => Self::Haskell,
-            "html" => Self::Html,
-            "java" => Self::Java,
-            "js" => Self::Js,
-            "json" => Self::Json,
-            "ipynb" => Self::JupyterNotebook,
-            "kt" => Self::Kotlin,
-            "lua" => Self::Lua,
-            "mk" | "mkfile" => Self::Makefile,
-            "md" | "markdown" => Self::Markdown,
-            "pas" => Self::Pascal,
-            "pl" | "perl" => Self::Perl,
-            "php" => Self::Php,
-            "py" => Self::Python,
-            "rb" | "ruby" => Self::Ruby,
-            "rs" => Self::Rust,
-            "scala" | "sc" => Self::Scala,
-            "sh" => Self::Shell,
-            "Svelte" | "svelte" => Self::Svelte,
-            "swift" => Self::Swift,
-            "toml" => Self::Toml,
-            "ts" | "tsx" => Self::Ts,
-            _ => Self::Others,
+    pub fn from_path(path: &Path) -> Option<Self> {
+        if let Some(extension) = path.extension()
+            && let Some(language) = extension.to_str()
+        {
+            let language = match language {
+                "ino" => Self::Arduino,
+                "asm" | "a51" | "inc" | "nasm" => Self::Assembly,
+                "bash" => Self::Bash,
+                "bat" | "cmd" => Self::Batchfile,
+                "c" | "h" => Self::C,
+                "clj" => Self::Clojure,
+                "cmake" => Self::CMake,
+                "cs" | "cake" | "cshtml" | "csx" => Self::CSharp,
+                "cpp" | "c++" | "cc" | "cp" | "cxx" | "hh" | "hpp" | "hxx" => Self::Cpp,
+                "css" => Self::Css,
+                "dart" => Self::Dart,
+                "go" => Self::Go,
+                "hs" | "hsc" => Self::Haskell,
+                "html" => Self::Html,
+                "java" => Self::Java,
+                "js" => Self::Js,
+                "json" => Self::Json,
+                "ipynb" => Self::JupyterNotebook,
+                "kt" => Self::Kotlin,
+                "lua" => Self::Lua,
+                "mk" | "mkfile" => Self::Makefile,
+                "md" | "markdown" => Self::Markdown,
+                "pas" => Self::Pascal,
+                "pl" | "perl" => Self::Perl,
+                "php" => Self::Php,
+                "py" => Self::Python,
+                "rb" | "ruby" => Self::Ruby,
+                "rs" => Self::Rust,
+                "scala" | "sc" => Self::Scala,
+                "sh" => Self::Shell,
+                "Svelte" | "svelte" => Self::Svelte,
+                "swift" => Self::Swift,
+                "toml" => Self::Toml,
+                "ts" | "tsx" => Self::Ts,
+                &_ => return None,
+            };
+            Some(language)
+        } else {
+            None
         }
     }
 

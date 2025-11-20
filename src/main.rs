@@ -1,22 +1,20 @@
-use std::env;
+use std::{env, path::PathBuf};
 
 use codestats::Analyzer;
 
 struct Config {
-    root: String,
+    root: PathBuf,
 }
 
 impl Config {
     fn generate() -> Self {
         let args: Vec<String> = env::args().collect();
         let root = if args.len() < 2 {
-            env::current_dir()
-                .expect("pwd dont found")
-                .into_os_string()
-                .into_string()
-                .expect("Path to string failed")
+            env::current_dir().expect("Err: pwd determination failed")
         } else {
-            args[1].to_string()
+            PathBuf::from(&args[1])
+                .canonicalize()
+                .expect("Path canonicalize failed")
         };
 
         Self { root }
