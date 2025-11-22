@@ -1,4 +1,5 @@
-use std::{env, path::PathBuf};
+use spinners::{Spinner, Spinners};
+use std::{env, path::PathBuf, sync::mpsc, thread};
 
 use codestats::{Analyzer, Config};
 
@@ -8,7 +9,7 @@ struct ArgParser {
     help: bool,
     show_version: bool,
     hide_icons: bool,
-    too_many_args: bool,
+    invalid_args: bool,
 }
 
 impl ArgParser {
@@ -34,7 +35,7 @@ impl ArgParser {
         if args.len() == 2 {
             arg_parser.root = Some(args[1].clone());
         } else if args.len() > 2 {
-            arg_parser.too_many_args = true;
+            arg_parser.invalid_args = true;
         }
 
         arg_parser
@@ -66,29 +67,47 @@ fn show_version() {
     println!("codestats v0.1.0");
 }
 
+fn check_arguements(arg_parser: &ArgParser) {
+    if arg_parser.help || arg_parser.show_version || arg_parser.invalid_args {
+        if arg_parser.invalid_args {
+            println!("Invalid arguements!");
+            print_help_message();
+        } else {
+            if arg_parser.help {
+                print_help_message();
+            }
+            if arg_parser.show_version {
+                show_version();
+            }
+        }
+        std::process::exit(0);
+    }
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let arg_parser = ArgParser::parse();
 
-    if arg_parser.too_many_args {
-        println!("Too many arguements! Only one project path is accepted");
-        print_help_message();
-        std::process::exit(0);
-    }
-
-    if arg_parser.help || arg_parser.show_version {
-        if arg_parser.help {
-            print_help_message();
-        }
-        if arg_parser.show_version {
-            show_version();
-        }
-        std::process::exit(0);
-    }
-
     let config = arg_parser.get_config()?;
+    check_arguements(&arg_parser);
 
-    let mut analyzer = Analyzer::new(config);
-    analyzer.analyze()?;
-    analyzer.show_table();
+    let (tx, rx) = mpsc::channel();
+
+    let mut spinner = Spinner::new(Spinners::Dots, "".into());
+    thread::spawn(move || {
+        let mut analyzer = Analyzer::new(config);
+        match analyzer.analyze() {
+            Ok(_) => {
+                if let Err(e) = tx.send(analyzer) {
+                    eprintln!("Err: {e}");
+                }
+            }
+            Err(e) => eprintln!("Err: {e}"),
+        }
+    });
+
+    if let Ok(analyzer) = rx.recv() {
+        spinner.stop_with_symbol("");
+        analyzer.show_table();
+    }
     Ok(())
 }

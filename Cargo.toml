@@ -7,4 +7,5 @@ license = "MIT"
 
 [dependencies]
 ignore = "0.4.25"
+spinners = "4.1.1"
 tabled = "0.20.0"
